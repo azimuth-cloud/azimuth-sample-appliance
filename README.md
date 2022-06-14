@@ -200,4 +200,4 @@ be presented in the Azimuth UI, in particular using the `usage_template` from th
 To do this, just use a `debug` task with the variable `outputs` set to a dictionary of outputs.
 
 For example, this appliance
-[uses the cluster outputs to return the allocated floating IP](./sample-appliance.yml#L29).
+[uses the cluster outputs to return the allocated floating IP](./sample-appliance.yml#L29-L34).
