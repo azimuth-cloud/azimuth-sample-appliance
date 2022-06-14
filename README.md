@@ -16,6 +16,7 @@ the two components.
 - [Ansible variables](#ansible-variables)
 - [Cluster metadata](#cluster-metadata)
 - [Resource provisioning](#resource-provisioning)
+- [Persistent state](#persistent-state)
 - [Cluster patching](#cluster-patching)
 - [Cluster outputs](#cluster-outputs)
 
@@ -160,11 +161,37 @@ particular specification - an example of how to use it can be
 [seen in this appliance](./roles/cluster_infra/tasks/main.yml). For more details, take a look at the role
 documentation and defaults.
 
+## Persistent state
+
+If your appliance requires persistent state, for example a database or
+[Ansible local facts](https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html#facts-d-or-local-facts),
+it is recommended that it is placed onto a volume whose lifecycle is tied to the cluster rather
+than any individual machine. This is to ensure that the state is preserved even if the individual
+machines are replaced, e.g. during a patch operation.
+
+Creating and attaching the relevant volumes can be done in the Terraform for your appliance.
+
 ## Cluster patching
 
 One of the operations available to users in the Azimuth UI is a "patch". The idea of this operation
 is that it gives the user control over when packages are updated on their cluster as this is a
 potentially disruptive operation.
+
+Patching can be done in two ways:
+
+  1. In-place using the OS package manager (e.g. `yum update -y`)
+  2. By replacing the machines with new ones based on an updated image
+
+The second option is preferred, and is implemented by this sample appliance in the
+[cluster_infra role](./roles/cluster_infra). This option is preferred because it ensures more
+consistency - images can be built and tested in advance before being rolled out to production.
+It also allows the use of "fat" images where the majority of the required packages are built
+into the image - this can speed up cluster provisioning significantly.
+
+When a patch is requested, the image specified in the `cluster_image` variable is used - this will
+force machines to be re-created if the referenced image has been updated. For all other updates,
+the image from the previous execution is used. This ensures that all machines in a cluster have
+a consistent image, even if they are created at different times (e.g. scaling the number of workers).
 
 ## Cluster outputs
 
