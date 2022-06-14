@@ -1,0 +1,35 @@
+name: "sample"
+label: "Sample Appliance"
+description: >- 
+  Simple round-robin Nginx load-balanced configuration.
+logo: https://upload.wikimedia.org/wikipedia/commons/c/c5/Nginx_logo.svg
+
+parameters:
+  - name: load_balancer_flavor
+    label: Load balancer size
+    description: The size to use for the load balancer node.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 1024
+      min_disk: 10
+
+  - name: backend_count
+    label: Backend node count
+    description: The number of backend nodes.
+    kind: integer
+    options:
+      min: 1
+    default: 3
+
+  - name: backend_flavor
+    label: Backend node size
+    description: The size to use for the backend nodes.
+    kind: "cloud.size"
+    immutable: true
+    options:
+      min_ram: 1024
+      min_disk: 10
+
+usage_template: |-
+  Usage goes here.
