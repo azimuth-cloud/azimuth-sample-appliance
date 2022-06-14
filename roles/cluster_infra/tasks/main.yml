@@ -1,0 +1,23 @@
+---
+
+- name: Make Terraform project directory
+  file:
+    path: "{{ terraform_project_path }}"
+    state: directory
+
+- name: Template Terraform files into project directory
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ terraform_project_path }}/{{ item }}"
+  loop:
+    - outputs.tf
+    - providers.tf
+    - resources.tf
+
+- name: Install Terraform binary
+  include_role:
+    name: stackhpc.terraform.install
+
+- name: Provision infrastructure
+  include_role:
+    name: stackhpc.terraform.infra

@@ -1,0 +1,28 @@
+---
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Nginx
+  package:
+    name: nginx
+    state: latest
+  register: nginx_package
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  register: nginx_default_site
+
+- name: Start and enable Nginx service
+  service:
+    name: nginx
+    state: >-
+      {{-
+        'restarted'
+        if nginx_package is changed or nginx_default_site is changed
+        else 'started'
+      }}
+    enabled: yes

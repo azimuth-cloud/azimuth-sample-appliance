@@ -1,0 +1,7 @@
+bin
+collections
+terraform
+.python-version
+clouds.yaml
+id_deploy*
+inventory

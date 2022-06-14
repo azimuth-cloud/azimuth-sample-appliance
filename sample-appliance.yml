@@ -1,0 +1,26 @@
+---
+
+# Provision the infrastructure
+# The CaaS puts hosts for accessing the OpenStack API into the 'openstack' group
+- hosts: openstack
+  roles:
+    - cluster_infra
+
+
+# All the hosts get Nginx
+- hosts: cluster
+  become: yes
+  roles:
+    - nginx_install
+
+# Configure the backends
+- hosts: backends
+  become: yes
+  roles:
+    - backend
+
+# Configure the load-balancer
+- hosts: load_balancers
+  become: yes
+  roles:
+    - load_balancer

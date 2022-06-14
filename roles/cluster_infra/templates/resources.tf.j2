@@ -1,0 +1,123 @@
+provider "openstack" { }
+
+#####
+##### The identity scope we are operating in
+##### Used to output the OpenStack project ID as a fact for provisioned hosts
+#####
+data "openstack_identity_auth_scope_v3" "scope" {
+  name = "{{ cluster_name }}"
+}
+
+#####
+##### Security groups
+#####
+
+# Security group to hold common rules for the nodes
+resource "openstack_networking_secgroup_v2" "common" {
+  name                 = "{{ cluster_name }}-common"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+# Security group to hold specific rules for the load-balancer node
+resource "openstack_networking_secgroup_v2" "load_balancer" {
+  name                 = "{{ cluster_name }}-load-balancer"
+  delete_default_rules = true   # Fully manage with terraform
+}
+
+# Allow all egress for all nodes
+resource "openstack_networking_secgroup_rule_v2" "common_egress_v4" {
+  direction         = "egress"
+  ethertype         = "IPv4"
+  security_group_id = "${openstack_networking_secgroup_v2.common.id}"
+}
+
+# Allow all ingress between nodes
+resource "openstack_networking_secgroup_rule_v2" "common_ingress_internal_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  remote_group_id   = "${openstack_networking_secgroup_v2.common.id}"
+  security_group_id = "${openstack_networking_secgroup_v2.common.id}"
+}
+
+# Allow ingress on port 22 (SSH) from anywhere for the load-balancer
+# We will use this node as a jump host for Ansible
+resource "openstack_networking_secgroup_rule_v2" "load_balancer_ingress_ssh_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 22
+  port_range_max    = 22
+  security_group_id = "${openstack_networking_secgroup_v2.load_balancer.id}"
+}
+
+# Allow ingress on port 80 (HTTP) from anywhere for the load-balancer
+resource "openstack_networking_secgroup_rule_v2" "load_balancer_ingress_http_v4" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 80
+  port_range_max    = 80
+  security_group_id = "${openstack_networking_secgroup_v2.load_balancer.id}"
+}
+
+#####
+##### Nodes
+#####
+
+resource "openstack_compute_instance_v2" "load_balancer" {
+  name      = "{{ cluster_name }}-lb"
+  image_id  = "{{ cluster_image }}"
+  flavor_id = "{{ load_balancer_flavor }}"
+
+  network {
+    name = "{{ cluster_network }}"
+  }
+
+  security_groups = [
+    "${openstack_networking_secgroup_v2.common.name}",
+    "${openstack_networking_secgroup_v2.load_balancer.name}"
+  ]
+
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+    ssh_authorized_keys:
+      - {{ cluster_deploy_ssh_public_key }}
+      - {{ cluster_user_ssh_public_key }}
+  EOF
+}
+
+resource "openstack_compute_instance_v2" "backend" {
+  count = {{ backend_count }}
+
+  name      = "{{ cluster_name }}-backend-${count.index}"
+  image_id  = "{{ cluster_image }}"
+  flavor_id = "{{ backend_flavor }}"
+
+  network {
+    name = "{{ cluster_network }}"
+  }
+
+  security_groups = ["${openstack_networking_secgroup_v2.common.name}"]
+
+  # Use cloud-init to inject the SSH keys
+  user_data = <<-EOF
+    #cloud-config
+    ssh_authorized_keys:
+      - {{ cluster_deploy_ssh_public_key }}
+      - {{ cluster_user_ssh_public_key }}
+  EOF
+}
+
+#####
+##### Floating IP and association for load balancer
+#####
+
+resource "openstack_networking_floatingip_v2" "load_balancer" {
+  pool = "{{ cluster_floating_ip_pool }}"
+}
+
+resource "openstack_compute_floatingip_associate_v2" "load_balancer" {
+  floating_ip = "${openstack_networking_floatingip_v2.load_balancer.address}"
+  instance_id = "${openstack_compute_instance_v2.load_balancer.id}"
+}
