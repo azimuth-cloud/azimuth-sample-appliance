@@ -1,3 +1,9 @@
+# This is used to determine the image to use unless explicitly patching
+output "cluster_image" {
+  description = "The id of the image used to build the cluster nodes"
+  value       = "{{ cluster_previous_image | default(cluster_image) }}"
+}
+
 output "cluster_gateway_ip" {
   description = "The IP address of the gateway used to contact the cluster nodes"
   value       = "${openstack_networking_floatingip_v2.load_balancer.address}"
