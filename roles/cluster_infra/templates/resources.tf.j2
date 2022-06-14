@@ -114,7 +114,7 @@ resource "openstack_compute_instance_v2" "backend" {
 #####
 
 resource "openstack_networking_floatingip_v2" "load_balancer" {
-  pool = "{{ cluster_floating_ip_pool }}"
+  pool = "{{ cluster_floating_network }}"
 }
 
 resource "openstack_compute_floatingip_associate_v2" "load_balancer" {

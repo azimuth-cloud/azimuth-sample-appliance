@@ -12,9 +12,11 @@ the two components.
 ## Contents  <!-- omit in toc -->
 
 - [Sample appliance architecture](#sample-appliance-architecture)
+- [AWX](#awx)
 - [Ansible variables](#ansible-variables)
 - [Cluster metadata](#cluster-metadata)
 - [Resource provisioning](#resource-provisioning)
+- [Cluster patching](#cluster-patching)
 - [Cluster outputs](#cluster-outputs)
 
 ## Sample appliance architecture
@@ -28,13 +30,74 @@ a single page that contains the IP of the host on the internal network. Hence wh
 the service multiple times, the end user should see a different IP address reported each
 time (when more than one backend is configured!).
 
-When [Zenith](https://github.com/stackhpc/zenith) is enabled for the target Azimuth
+<!-- When [Zenith](https://github.com/stackhpc/zenith) is enabled for the target Azimuth
 deployment, the appliance exposes the load-balancer using a Zenith domain. An ephemeral
 [SSH jump host](https://wiki.gentoo.org/wiki/SSH_jump_host) with a floating IP is used
 to allow Ansible to access the hosts for configuration.
 
 When Zenith is not enabled, the load-balancer is exposed using a floating IP which is
-reported to the user using the cluster outputs.
+reported to the user using the cluster outputs. -->
+
+The load-balancer is exposed using a floating IP which is reported to the user using the
+cluster outputs.
+
+## AWX
+
+Azimuth CaaS appliances are driven using [AWX](https://github.com/ansible/awx). In practice,
+this makes very little difference other than some small constraints on the layout of your
+repository:
+
+  * Entrypoint playbooks should be at the top level of the repository, e.g.
+    [sample-appliance.yml](./sample-appliance.yml)
+  * Roles should be in a `roles` directory at the top level of the repository
+  * Requirements need to be specified in particular places
+    * Roles should be specified in `roles/requirements.yml`
+    * Collections should be specified in `requirements.yml` or `collections/requirements.yml`
+    * This appliance uses a single file containing all requirements at
+      [requirements.yml](./requirements.yml) which is symlinked from `roles/requirements.yml`
+  * If a custom `ansible.cfg` is required, it should be at the top level of the repository
+
+For some advanced use cases, for example if additional packages are required to execute your
+playbooks, a custom
+[execution environment image](https://ansible-runner.readthedocs.io/en/latest/execution_environments/)
+maybe be required. By default Azimuth uses the [caas-ee](https://github.com/stackhpc/caas-ee),
+which can be extended as required.
+
+In AWX, a [Project](https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html)
+is a collection of Ansible playbooks corresponding to a repository. A
+[Job Template](https://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html)
+refers to a specific playbook inside a project, and can also set a number of other options
+related to running the playbook.
+
+In particular, variables that vary from site-to-site but are fixed for all deployments of the
+appliance at a particular site can be set in the `extra_vars` of the AWX Job Template. For
+example, when deployed in Azimuth, this appliance would require `cluster_image` to be set to
+the ID of an Ubuntu 20.04 image on the target cloud.
+
+Azimuth will deal with the mechanics of setting up the required AWX resources using the
+`azimuth_caas_awx_default_projects` of the
+[azimuth-ops Ansible collection](https://github.com/stackhpc/ansible-collection-azimuth-ops).
+For example, to use this appliance in an Azimuth deployment, the following configuration
+would be used:
+
+```yaml
+azimuth_caas_awx_default_projects:
+  - name: StackHPC Sample Appliance
+    gitUrl: https://github.com/stackhpc/azimuth-sample-appliance.git
+    gitVersion: main
+    metadataRoot: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/main/ui-meta
+    playbooks: [sample-appliance.yml]
+    extraVars:
+      __ALL__:
+        cluster_image: "<ID of an Ubuntu 20.04 image>"
+```
+
+If you are using `infra_community_images` to manage your images as part of the Azimuth deployment,
+you can easily use the ID of one of the uploaded images:
+
+```yaml
+cluster_image: "{{ infra_community_image_info.ubuntu_2004_20220411 }}"
+```
 
 ## Ansible variables
 
@@ -45,11 +108,24 @@ These fall into three groups:
     project into which the appliance is being deployed.
   * **User-provided variables**: Variables provided by the user using the form in the
     user interface. These are controlled by the cluster metadata file.
-  * **Zenith services**: Variables provided by Azimuth describing the Zenith subdomains
+  <!-- * **Zenith services**: Variables provided by Azimuth describing the Zenith subdomains
     assigned to the appliance's services. The services are defined in the cluster metadata
-    file. These variables are only provided when Zenith is enabled.
+    file. These variables are only provided when Zenith is enabled. -->
 
 The following system variables are provided by Azimuth:
+
+| Variable name | Description |
+|---|---|
+| `cluster_id` | The ID of the cluster. Should be used in the Terraform cluster state key. |
+| `cluster_name` | The name of the cluster as given by the user. |
+| `cluster_type` | The name of the cluster type. |
+| `cluster_user_ssh_public_key` | The SSH public key of the user that deployed the cluster. |
+| `cluster_deploy_ssh_public_key` | The SSH public key used by AWX to configure the hosts. |
+| `cluster_ssh_private_key_file` | The path to a file containing the private key corresponding to `cluster_deploy_ssh_public_key`.<br>This is consumed by the `stackhpc.terraform.infra` role. |
+| `cluster_network` | The name of the project internal network onto which cluster nodes should be placed. |
+| `cluster_floating_network` | The name of the floating network where floating IPs can be allocated. |
+| `cluster_upgrade_system_packages` | This variable is set when a PATCH operation is requested.<br>If given and `true`, it indicates that system packages should be upgraded. If not given, it should be assumed to be `false`.<br>The mechanism for acheiving this is appliance-specific, but it is expected to be a disruptive operation (e.g. rebuilding nodes).<br>If not given or set to `false`, disruptive operations should be avoided where possible. |
+| `cluster_state` | This variable is set when a DELETE operation is requested.<br>If given and set to `absent` all cluster resources should be deleted, otherwise cluster resources should be updated as normal. |
 
 ## Cluster metadata
 
@@ -59,22 +135,42 @@ the cluster such as the human-readable name, logo URL and description. It also d
 variables that should be collected from the user, including how they should be validated
 and rendered in the form that the user sees in the Azimuth UI.
 
-When Zenith is enabled, the cluster metadata file also specifies the services for which
-Zenith subdomains should be allocated and passed to the playbook.
+<!-- When Zenith is enabled, the cluster metadata file also specifies the services for which
+Zenith subdomains should be allocated and passed to the playbook. -->
+
+The cluster metadata file for this sample appliance is at
+[ui-meta/sample-appliance.yml](./ui-meta/sample-appliance.yml). It is heavily documented to
+describe the available options.
 
 ## Resource provisioning
 
-In this sample appliance, resources are provisioned using Terraform and then adopted into
+It is recommended that resources for an appliance are provisioned using Terraform and then adopted into
 the in-memory inventory using the
 [add_host module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/add_host_module.html).
+
+This appliance uses Terraform to provision security groups, servers and the floating IP and
+corresponding association. However it is possible to provision any of the resources supported by
+the
+[Terraform OpenStack provider](https://registry.terraform.io/providers/terraform-provider-openstack/openstack/latest/docs).
 
 It is possible to implement this process yourself, however StackHPC provide a role -
 [stackhpc.terraform.infra](https://github.com/stackhpc/ansible-collection-terraform/tree/main/roles/infra) -
 to simplify the process. This can be used as long as your Terraform outputs conform to a
-particular specification - an example of how to use it can be seen in this appliance.
-For more details, take a look at the role documentation and defaults.
+particular specification - an example of how to use it can be
+[seen in this appliance](./roles/cluster_infra/tasks/main.yml). For more details, take a look at the role
+documentation and defaults.
+
+## Cluster patching
+
+One of the operations available to users in the Azimuth UI is a "patch". The idea of this operation
+is that it gives the user control over when packages are updated on their cluster as this is a
+potentially disruptive operation.
 
 ## Cluster outputs
 
-When a cluster playbook executes successfully, the last task is able to return outputs
-that can be consumed by the Azimuth UI.
+When a cluster playbook executes successfully the last task is able to return outputs that can
+be presented in the Azimuth UI, in particular using the `usage_template` from the cluster metadata.
+To do this, just use a `debug` task with the variable `outputs` set to a dictionary of outputs.
+
+For example, this appliance
+[uses the cluster outputs to return the allocated floating IP](./sample-appliance.yml#29).
