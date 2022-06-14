@@ -42,10 +42,10 @@ usage_template: |-
 
   # Accessing the cluster
 
-  It is also rendered as a Jinja2 template with the cluster API object available
-  as the variable `cluster` in the template context. In particular this permits
-  the template to access the cluster outputs - in this case, we can use that
-  to render a link to the service using the allocated external IP:
+  This section is treated as a Jinja2 template with the cluster API object available
+  as the variable `cluster` in the template context. In particular this permits the
+  template access to the cluster outputs - in this case, we can use that to render
+  a link to the service using the allocated external IP:
 
   {% if cluster.outputs.cluster_access_ip %}
     Web service available at http://{{ cluster.outputs.cluster_access_ip }}.

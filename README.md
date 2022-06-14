@@ -1,8 +1,8 @@
 # azimuth-sample-appliance  <!-- omit in toc -->
 
-This repository contains a sample appliance that is intended to serve as documentation
-on how to build an appliance that is compatible with the Cluster-as-a-Service (CaaS)
-subsystem of [Azimuth](https://github.com/stackhpc/azimuth).
+This repository contains a sample appliance that also serves as documentation on how
+to build an appliance for use with [Azimuth](https://github.com/stackhpc/azimuth)
+Cluster-as-a-Service (CaaS).
 
 The appliance uses [Terraform](https://www.terraform.io/) to provision resources (e.g.
 servers, security groups, ports, volumes) and [Ansible](https://www.ansible.com/) to
@@ -11,22 +11,22 @@ the two components.
 
 ## Contents  <!-- omit in toc -->
 
-- [Appliance architecture](#appliance-architecture)
+- [Sample appliance architecture](#sample-appliance-architecture)
 - [Ansible variables](#ansible-variables)
 - [Cluster metadata](#cluster-metadata)
 - [Resource provisioning](#resource-provisioning)
 - [Cluster outputs](#cluster-outputs)
 
-## Appliance architecture
+## Sample appliance architecture
 
 This sample appliance is a simple HTTP service, consisting of one or more backends with
 a load-balancer in front.
 
 The load-balancer is an [Nginx](https://nginx.org/) server that is configured to forward
 traffic to the backends. The backends are also Nginx servers, and are configured to render
-a single page that contains the IP on the internal network of the host. Hence by refreshing
-the page in the browser, the end user should see a different IP address reported each time
-when more than one backend is configured.
+a single page that contains the IP of the host on the internal network. Hence when hitting
+the service multiple times, the end user should see a different IP address reported each
+time (when more than one backend is configured!).
 
 When [Zenith](https://github.com/stackhpc/zenith) is enabled for the target Azimuth
 deployment, the appliance exposes the load-balancer using a Zenith domain. An ephemeral
