@@ -103,12 +103,12 @@ cluster_image: "{{ infra_community_image_info.ubuntu_2004_20220411 }}"
 ## Ansible variables
 
 When invoking an appliance using an AWX job, Azimuth passes a number of Ansible variables.
-These fall into three groups:
+These fall into the following groups:
 
   * **System variables**: Variables derived by Azimuth providing information about the
-    project into which the appliance is being deployed.
+    environment in which the appliance is being deployed.
   * **User-provided variables**: Variables provided by the user using the form in the
-    user interface. These are controlled by the cluster metadata file.
+    Azimuth user interface. These are controlled by the cluster metadata file.
   <!-- * **Zenith services**: Variables provided by Azimuth describing the Zenith subdomains
     assigned to the appliance's services. The services are defined in the cluster metadata
     file. These variables are only provided when Zenith is enabled. -->
@@ -117,7 +117,7 @@ The following system variables are provided by Azimuth:
 
 | Variable name | Description |
 |---|---|
-| `cluster_id` | The ID of the cluster. Should be used in the Terraform cluster state key. |
+| `cluster_id` | The ID of the cluster. Should be used in the [Terraform state key](./group_vars/openstack.yml#L2). |
 | `cluster_name` | The name of the cluster as given by the user. |
 | `cluster_type` | The name of the cluster type. |
 | `cluster_user_ssh_public_key` | The SSH public key of the user that deployed the cluster. |
@@ -200,4 +200,4 @@ be presented in the Azimuth UI, in particular using the `usage_template` from th
 To do this, just use a `debug` task with the variable `outputs` set to a dictionary of outputs.
 
 For example, this appliance
-[uses the cluster outputs to return the allocated floating IP](./sample-appliance.yml#29).
+[uses the cluster outputs to return the allocated floating IP](./sample-appliance.yml#L29).
