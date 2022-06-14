@@ -48,7 +48,7 @@ usage_template: |-
   we can use that to render a link to the service using the allocated external IP:
 
   {% if cluster.outputs.cluster_access_ip %}
-  > Web service available at http://{{ cluster.outputs.cluster_access_ip }}.
+  Web service available at [{{ cluster.outputs.cluster_access_ip }}](http://{{ cluster.outputs.cluster_access_ip }}).
   {% else %}
-  > Web service is not ready yet.
+  Web service is not ready yet.
   {% endif %}
