@@ -1,14 +1,82 @@
+# The machine-readable name of the appliance
 name: "sample"
+# The human-readable label for the appliance
 label: "Sample Appliance"
+# A short description of the appliance, rendered as-is
 description: Sample appliance - for demonstration purposes only.
+# The URL of the logo for the appliance
+# This should be an HTTPS URL, because plain HTTP URLs will cause content warnings when Azimuth is served over HTTPS
+# Alternatively, as shown here, a data URL can be used to encode the image directly 
 logo: data:image/png;base64,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
 
+# A list of parameters to be gathered from the user
 parameters:
-  - name: load_balancer_flavor
+  - # The name of the Ansible variable that will be populated with the parameter value.
+    # This field is required.
+    name: load_balancer_flavor
+    # A human-readable name for the parameter. Defaults to the name if not given.
     label: Load balancer size
+    # An optional short description for the parameter.
     description: The size to use for the load balancer node.
+    # The kind of the parameter. This field is required.
+    # Valid values are:
+    #   list
+    #     A list of items.
+    #   string
+    #     A string or something that can be coerced.
+    #   integer
+    #     An integer or a string that can be coerced.
+    #   number
+    #     Any number, i.e. an integer or a float, or a string that can be coerced.
+    #   boolean
+    #     A boolean flag.
+    #     Valid values are: true/false, 1/0, "1"/"0", "true"/"false" and "yes"/"no".
+    #   choice
+    #     A value from a set of choices.
+    #   cloud.size
+    #     The ID of a size in the target tenancy.
+    #   cloud.machine
+    #     The ID of a machine in the target tenancy.
+    #   cloud.ip
+    #     The ID of an external IP in the target tenancy.
+    #   cloud.volume
+    #     The ID of a volume in the target tenancy.
+    #   cloud.cluster
+    #     The ID of another cluster in the target tenancy.
     kind: "cloud.size"
+    # Indicates whether the parameter is required. Defaults to true if not given.
+    required: true
+    # The default value value for the parameter. Defaults to null if not given, indicating no default.
+    default: null
+    # Indicates whether the parameter is immutable, i.e. cannot be changed after the initial creation.
+    # Defaults to false if not given.
     immutable: true
+    # Additional options for the parameter. The valid options depend on the kind of the parameter.
+    #   list
+    #     min_length: An optional minimum length for the list.
+    #     max_length: An optional maximum length for the list.
+    #     item: An optional item validator, consisting of a kind and some options.
+    #   string
+    #     min_length: An optional minimum length for the string.
+    #     max_length: An optional maximum length for the string.
+    #     pattern: An optional regular expression pattern to validate the string against.
+    #   integer
+    #   number
+    #     min: An optional minimum permitted value for the number.
+    #     max: An optional maximum permitted value for the number.
+    #   boolean
+    #     permanent: If true, indicates that the parameter cannot become false again once it has
+    #                been set to true. Defaults to false if not given.
+    #   choice
+    #     choices: The list of valid choices for the parameter. This field is required.
+    #   cloud.size
+    #     min_cpus: An optional minimum number of CPUs that the size must have.
+    #     min_ram: An optional minimum amount of RAM in MB that the size must have.
+    #     min_disk: An optional minimum root disk size in GB that the size must have.
+    #   cloud.volume
+    #     min_size: An optional minimum size in GB for the volume.
+    #   cloud.cluster
+    #     tag: An optional tag that the cluster must have.
     options:
       min_ram: 1024
       min_disk: 10
@@ -30,22 +98,31 @@ parameters:
       min_ram: 1024
       min_disk: 10
 
+# A template describing the usage of the appliance
+# This is rendered in the "Cluster details" modal in the Azimuth UI
 usage_template: |-
   This sample appliance demonstrates how to build an appliance for use with the
   [Azimuth](https://github.com/stackhpc/azimuth) Cluster-as-a-Service (CaaS) system.
 
-  This usage section is defined in the cluster metadata for the appliance. It is
-  rendered as [Markdown](https://en.wikipedia.org/wiki/Markdown), allowing for:
+  This content is defined in the `usage_template` field of the cluster metadata for the appliance.
+  It is generated by first rendering the `usage_template` using
+  [nunjucks](https://mozilla.github.io/nunjucks/) - a client-side templating engine with a similar
+  syntax to [Jinja2](https://jinja.palletsprojects.com/). The output from rendering the template
+  is treated as [Markdown](https://en.wikipedia.org/wiki/Markdown), which is used to produce the
+  HTML that is shown to the user.
+  
+  When the template is rendered, the cluster API object available as the variable `cluster`.
+  This means that the template is able to access the cluster parameter values and outputs in
+  order to use them during rendering.
+
+  Markdown also allow the template to use
 
     * all sorts of
     * *rich* ***formatting*** **options**
 
   # Accessing the cluster
 
-  This section is treated as a [Jinja2](https://jinja.palletsprojects.com/) template
-  with the cluster API object available as the variable `cluster` in the template context.
-  In particular this permits the template access to the cluster outputs - in this case,
-  we can use that to render a link to the service using the allocated external IP:
+  We can use the cluster outputs to render a link to the service using the allocated external IP:
 
   {% if cluster.outputs.cluster_access_ip %}
   Web service available at [{{ cluster.outputs.cluster_access_ip }}](http://{{ cluster.outputs.cluster_access_ip }}).
