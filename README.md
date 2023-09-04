@@ -12,7 +12,7 @@ the two components.
 ## Contents  <!-- omit in toc -->
 
 - [Sample appliance architecture](#sample-appliance-architecture)
-- [AWX](#awx)
+- [Azimuth CaaS Operator](#azimuth-caas-operator)
 - [Ansible variables](#ansible-variables)
 - [Cluster metadata](#cluster-metadata)
 - [Resource provisioning](#resource-provisioning)
@@ -42,10 +42,10 @@ reported to the user using the cluster outputs. -->
 The load-balancer is exposed using a floating IP which is reported to the user using the
 cluster outputs.
 
-## AWX
+## Azimuth CaaS Operator
 
-Azimuth CaaS appliances are driven using [AWX](https://github.com/ansible/awx). In practice,
-this makes very little difference other than some small constraints on the layout of your
+Azimuth CaaS appliances are driven using the [Azimuth CaaS Operator](https://github.com/stackhpc/azimuth-caas-operator). 
+In practice, this makes very little difference other than some small constraints on the layout of your
 repository:
 
   * Entrypoint playbooks should be at the top level of the repository, e.g.
@@ -58,39 +58,31 @@ repository:
       [requirements.yml](./requirements.yml) which is symlinked from `roles/requirements.yml`
   * If a custom `ansible.cfg` is required, it should be at the top level of the repository
 
-For some advanced use cases, for example if additional packages are required to execute your
-playbooks, a custom
-[execution environment image](https://ansible-runner.readthedocs.io/en/latest/execution_environments/)
-maybe be required. By default Azimuth uses the [caas-ee](https://github.com/stackhpc/caas-ee),
-which can be extended as required.
-
-In AWX, a [Project](https://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html)
-is a collection of Ansible playbooks corresponding to a repository. A
-[Job Template](https://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html)
-refers to a specific playbook inside a project, and can also set a number of other options
-related to running the playbook.
-
-In particular, variables that vary from site-to-site but are fixed for all deployments of the
-appliance at a particular site can be set in the `extra_vars` of the AWX Job Template. For
+Variables that vary from site-to-site but are fixed for all deployments of the
+appliance at a particular site can be set in the `extra_vars` of the `ClusterTemplate` resource. For
 example, when deployed in Azimuth, this appliance would require `cluster_image` to be set to
 the ID of an Ubuntu 20.04 image on the target cloud.
 
-Azimuth will deal with the mechanics of setting up the required AWX resources using the
-`azimuth_caas_awx_default_projects` of the
+Azimuth will deal with the mechanics of setting up the required resources using the
+`azimuth_caas_cluster_templates_overrides` of the
 [azimuth-ops Ansible collection](https://github.com/stackhpc/ansible-collection-azimuth-ops).
 For example, to use this appliance in an Azimuth deployment, the following configuration
 would be used:
 
 ```yaml
-azimuth_caas_awx_default_projects:
-  - name: StackHPC Sample Appliance
+azimuth_caas_cluster_templates_overrides:
+  sample-appliance:
+    # The git URL of the appliance
     gitUrl: https://github.com/stackhpc/azimuth-sample-appliance.git
+    # The branch, tag or commit id to use
     gitVersion: main
-    metadataRoot: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/main/ui-meta
-    playbooks: [sample-appliance.yml]
+    # The name of the playbook to use
+    playbook: sample-appliance.yml
+    # The URL of the metadata file
+    uiMetaUrl: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/master/ui-meta/sample-appliance.yml
+    # Dict of extra variables for the appliance
     extraVars:
-      __ALL__:
-        cluster_image: "<ID of an Ubuntu 20.04 image>"
+      cluster_image: "<ID of an Ubuntu 20.04 image>"
 ```
 
 If you are using `infra_community_images` to manage your images as part of the Azimuth deployment,
@@ -102,7 +94,7 @@ cluster_image: "{{ infra_community_image_info.ubuntu_2004_20220411 }}"
 
 ## Ansible variables
 
-When invoking an appliance using an AWX job, Azimuth passes a number of Ansible variables.
+When invoking an appliance, Azimuth passes a number of Ansible variables.
 These fall into the following groups:
 
   * **System variables**: Variables derived by Azimuth providing information about the
