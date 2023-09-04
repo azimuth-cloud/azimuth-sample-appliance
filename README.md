@@ -79,7 +79,7 @@ azimuth_caas_cluster_templates_overrides:
     # The name of the playbook to use
     playbook: sample-appliance.yml
     # The URL of the metadata file
-    uiMetaUrl: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/master/ui-meta/sample-appliance.yaml
+    uiMetaUrl: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/master/ui-meta/sample-appliance.yml
     # Dict of extra variables for the appliance
     extraVars:
       cluster_image: "<ID of an Ubuntu 20.04 image>"
