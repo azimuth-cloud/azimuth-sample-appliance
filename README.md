@@ -75,7 +75,7 @@ azimuth_caas_cluster_templates_overrides:
     # The git URL of the appliance
     gitUrl: https://github.com/stackhpc/azimuth-sample-appliance.git
     # The branch, tag or commit id to use
-    gitVersion: master
+    gitVersion: main
     # The name of the playbook to use
     playbook: sample-appliance.yml
     # The URL of the metadata file
