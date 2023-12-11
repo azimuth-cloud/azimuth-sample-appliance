@@ -67,6 +67,8 @@ parameters:
     #   boolean
     #     permanent: If true, indicates that the parameter cannot become false again once it has
     #                been set to true. Defaults to false if not given.
+    #     checkboxLabel: An alternate label for the checkbox text, if not specified, the main label
+    #                    for the parameter will be used instead
     #   choice
     #     choices: The list of valid choices for the parameter. This field is required.
     #   cloud.size
@@ -110,7 +112,7 @@ usage_template: |-
   syntax to [Jinja2](https://jinja.palletsprojects.com/). The output from rendering the template
   is treated as [Markdown](https://en.wikipedia.org/wiki/Markdown), which is used to produce the
   HTML that is shown to the user.
-  
+
   When the template is rendered, the cluster API object available as the variable `cluster`.
   This means that the template is able to access the cluster parameter values and outputs in
   order to use them during rendering.
