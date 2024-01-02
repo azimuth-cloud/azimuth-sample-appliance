@@ -79,17 +79,17 @@ azimuth_caas_cluster_templates_overrides:
     # The name of the playbook to use
     playbook: sample-appliance.yml
     # The URL of the metadata file
-    uiMetaUrl: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/master/ui-meta/sample-appliance.yml
+    uiMetaUrl: https://raw.githubusercontent.com/stackhpc/azimuth-sample-appliance/main/ui-meta/sample-appliance.yml
     # Dict of extra variables for the appliance
     extraVars:
       cluster_image: "<ID of an Ubuntu 20.04 image>"
 ```
 
-If you are using `infra_community_images` to manage your images as part of the Azimuth deployment,
+If you are using `community_images_image_ids` to manage your images as part of the Azimuth deployment,
 you can easily use the ID of one of the uploaded images:
 
 ```yaml
-cluster_image: "{{ infra_community_image_info.ubuntu_2004_20220411 }}"
+cluster_image: "{{ community_images_image_ids.ubuntu_2004_20220411 }}"
 ```
 
 ## Ansible variables
