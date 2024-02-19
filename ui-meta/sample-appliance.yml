@@ -54,6 +54,11 @@ parameters:
     # Indicates whether the parameter is immutable, i.e. cannot be changed after the initial creation.
     # Defaults to false if not given.
     immutable: true
+    # Indicates whether or not the parameter should be visible in the Azimuth UI.
+    # Defaults to false if not given.
+    # Can be useful for ensuring accurate quota calculations while not cluttering the UI, e.g.
+    # https://github.com/stackhpc/caas-workstation/blob/0.3.0/ui-meta/workstation.yml#L31-L37
+    hidden: false
     # Additional options for the parameter. The valid options depend on the kind of the parameter.
     #   list
     #     min_length: An optional minimum length for the list.
@@ -116,6 +121,7 @@ parameters:
     kind: "cloud.size"
     immutable: true
     options:
+      count_parameter: backend_count
       min_ram: 1024
       min_disk: 10
 
