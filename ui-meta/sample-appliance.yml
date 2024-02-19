@@ -39,6 +39,9 @@ parameters:
     #     The ID of a machine in the target tenancy.
     #   cloud.ip
     #     The ID of an external IP in the target tenancy.
+    #   cloud.volume_size
+    #     An integer that represents the size of a volume that will be created.
+    #     Used for quota calcuations.
     #   cloud.volume
     #     The ID of a volume in the target tenancy.
     #   cloud.cluster
@@ -51,6 +54,11 @@ parameters:
     # Indicates whether the parameter is immutable, i.e. cannot be changed after the initial creation.
     # Defaults to false if not given.
     immutable: true
+    # Indicates whether or not the parameter should be visible in the Azimuth UI.
+    # Defaults to false if not given.
+    # Can be useful for ensuring accurate quota calculations while not cluttering the UI, e.g.
+    # https://github.com/stackhpc/caas-workstation/blob/0.3.0/ui-meta/workstation.yml#L31-L37
+    hidden: false
     # Additional options for the parameter. The valid options depend on the kind of the parameter.
     #   list
     #     min_length: An optional minimum length for the list.
@@ -72,9 +80,27 @@ parameters:
     #   choice
     #     choices: The list of valid choices for the parameter. This field is required.
     #   cloud.size
+    #     count_parameter: The name of the parameter that specifies how many machines of
+    #                      this size will be created. The count defaults to 1 if this is
+    #                      not given. Used for quota calculations.
     #     min_cpus: An optional minimum number of CPUs that the size must have.
     #     min_ram: An optional minimum amount of RAM in MB that the size must have.
     #     min_disk: An optional minimum root disk size in GB that the size must have.
+    #     min_ephemeral_disk: An optional minimum amount of ephemeral disk in GB that the size must have.
+    #     has_properties: A list of additional properties that the size must have.
+    #                     Each item in the list should have a "name" property containing the
+    #                     required property name.
+    #                     Each item can optionally have a "value" property containing the
+    #                     required value for the property. If the "value" property is not given,
+    #                     any value is considered acceptable.
+    #                     On OpenStack, the additional properties of the size are populated
+    #                     from the extra_specs of the underlying flavor.
+    #   cloud.volume_size:
+    #     count_parameter: The name of the parameter that specifies how many volumes of
+    #                      this size will be created. The count defaults to 1 if this is
+    #                      not given. Used for quota calculations.
+    #     min: An optional minimum size for the volume in GB (defaults to 1 if not given).
+    #     max: An optional maximum size for the volume in GB.
     #   cloud.volume
     #     min_size: An optional minimum size in GB for the volume.
     #   cloud.cluster
@@ -97,6 +123,7 @@ parameters:
     kind: "cloud.size"
     immutable: true
     options:
+      count_parameter: backend_count
       min_ram: 1024
       min_disk: 10
 
