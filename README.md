@@ -48,16 +48,12 @@ Azimuth CaaS appliances are driven using the [Azimuth CaaS Operator](https://git
 In practice, this makes very little difference other than some small constraints on the layout of your
 repository:
 
-  * Entrypoint playbooks should be at the top level of the repository, e.g.
-    [sample-appliance.yml](./sample-appliance.yml)
-  * Roles should be in a `roles` directory at the top level of the repository
-  * Requirements need to be specified in particular places
-    * Roles should be specified in `roles/requirements.yml`
-    * Collections should be specified in `requirements.yml` or `collections/requirements.yml`
-    * This appliance uses a single file containing all requirements at
-      [requirements.yml](./requirements.yml) which is symlinked from `roles/requirements.yml`
-  * If a custom `ansible.cfg` is required, it should be at the top level of the repository
-
+  * Roles should be in a `roles` directory at the top level of the repository, unless specified
+    otherwise using `roles_path` in a custom `ansible.cfg`.
+  * If a `requirements.yml` file defining roles and collections is required it must be either in
+    the top level of the repository or in the `roles` directory.
+  * If a custom `ansible.cfg` is required, it should be at the top level of the repository.
+  
 Variables that vary from site-to-site but are fixed for all deployments of the
 appliance at a particular site can be set in the `extra_vars` of the `ClusterTemplate` resource. For
 example, when deployed in Azimuth, this appliance would require `cluster_image` to be set to
