@@ -11,9 +11,8 @@ terraform_backend_config_defaults:
   local: {}
 terraform_backend_config: "{{ terraform_backend_config_defaults[terraform_backend_type] }}"
 
-# These variables control the location of the Terraform binary
+# The folder where the OpenTofu binary will be downloaded to, if required
 terraform_binary_directory: "{{ playbook_dir }}/bin"
-terraform_binary_path: "{{ terraform_binary_directory }}/terraform"
 
 # This controls the location where the Terraform files are rendered
 terraform_project_path: "{{ playbook_dir }}/terraform"
