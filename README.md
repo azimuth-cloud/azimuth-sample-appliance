@@ -1,4 +1,4 @@
-# azimuth-sample-appliance  <!-- omit in toc -->
+# azimuth-sample-appliance <!-- omit in toc -->
 
 This repository contains a sample appliance that also serves as documentation on how
 to build an appliance for use with [Azimuth](https://github.com/stackhpc/azimuth)
@@ -9,7 +9,7 @@ servers, security groups, ports, volumes) and [Ansible](https://www.ansible.com/
 configure them, taking advantage of Ansible's support for dynamic inventory to bridge
 the two components.
 
-## Contents  <!-- omit in toc -->
+## Contents <!-- omit in toc -->
 
 - [Sample appliance architecture](#sample-appliance-architecture)
 - [Azimuth CaaS Operator](#azimuth-caas-operator)
@@ -44,16 +44,16 @@ cluster outputs.
 
 ## Azimuth CaaS Operator
 
-Azimuth CaaS appliances are driven using the [Azimuth CaaS Operator](https://github.com/stackhpc/azimuth-caas-operator). 
+Azimuth CaaS appliances are driven using the [Azimuth CaaS Operator](https://github.com/stackhpc/azimuth-caas-operator).
 In practice, this makes very little difference other than some small constraints on the layout of your
 repository:
 
-  * Roles should be in a `roles` directory at the top level of the repository, unless specified
-    otherwise using `roles_path` in a custom `ansible.cfg`.
-  * If a `requirements.yml` file defining roles and collections is required it must be either in
-    the top level of the repository or in the `roles` directory.
-  * If a custom `ansible.cfg` is required, it should be at the top level of the repository.
-  
+- Roles should be in a `roles` directory at the top level of the repository, unless specified
+  otherwise using `roles_path` in a custom `ansible.cfg`.
+- If a `requirements.yml` file defining roles and collections is required it must be either in
+  the top level of the repository or in the `roles` directory.
+- If a custom `ansible.cfg` is required, it should be at the top level of the repository.
+
 Variables that vary from site-to-site but are fixed for all deployments of the
 appliance at a particular site can be set in the `extra_vars` of the `ClusterTemplate` resource. For
 example, when deployed in Azimuth, this appliance would require `cluster_image` to be set to
@@ -93,28 +93,28 @@ cluster_image: "{{ community_images_image_ids.ubuntu_2004_20220411 }}"
 When invoking an appliance, Azimuth passes a number of Ansible variables.
 These fall into the following groups:
 
-  * **System variables**: Variables derived by Azimuth providing information about the
-    environment in which the appliance is being deployed.
-  * **User-provided variables**: Variables provided by the user using the form in the
-    Azimuth user interface. These are controlled by the cluster metadata file.
-  <!-- * **Zenith services**: Variables provided by Azimuth describing the Zenith subdomains
-    assigned to the appliance's services. The services are defined in the cluster metadata
-    file. These variables are only provided when Zenith is enabled. -->
+- **System variables**: Variables derived by Azimuth providing information about the
+  environment in which the appliance is being deployed.
+- **User-provided variables**: Variables provided by the user using the form in the
+Azimuth user interface. These are controlled by the cluster metadata file.
+<!-- * **Zenith services**: Variables provided by Azimuth describing the Zenith subdomains
+  assigned to the appliance's services. The services are defined in the cluster metadata
+  file. These variables are only provided when Zenith is enabled. -->
 
 The following system variables are provided by Azimuth:
 
-| Variable name | Description |
-|---|---|
-| `cluster_id` | The ID of the cluster. Should be used in the [Terraform state key](./group_vars/openstack.yml#L2). |
-| `cluster_name` | The name of the cluster as given by the user. |
-| `cluster_type` | The name of the cluster type. |
-| `cluster_user_ssh_public_key` | The SSH public key of the user that deployed the cluster. |
-| `cluster_deploy_ssh_public_key` | The SSH public key used by AWX to configure the hosts. |
-| `cluster_ssh_private_key_file` | The path to a file containing the private key corresponding to `cluster_deploy_ssh_public_key`.<br>This is consumed by the `stackhpc.terraform.infra` role. |
-| `cluster_network` | The name of the project internal network onto which cluster nodes should be placed. |
-| `cluster_floating_network` | The name of the floating network where floating IPs can be allocated. |
+| Variable name                     | Description                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `cluster_id`                      | The ID of the cluster. Should be used in the [Terraform state key](./group_vars/openstack.yml#L2).                                                                                                                                                                                                                                                                                                                       |
+| `cluster_name`                    | The name of the cluster as given by the user.                                                                                                                                                                                                                                                                                                                                                                            |
+| `cluster_type`                    | The name of the cluster type.                                                                                                                                                                                                                                                                                                                                                                                            |
+| `cluster_user_ssh_public_key`     | The SSH public key of the user that deployed the cluster.                                                                                                                                                                                                                                                                                                                                                                |
+| `cluster_deploy_ssh_public_key`   | A cluster-specific SSH public key generated by the CaaS operator.                                                                                                                                                                                                                                                                                                                                                        |
+| `cluster_ssh_private_key_file`    | The path to a file containing the private key corresponding to `cluster_deploy_ssh_public_key`.<br>This is consumed by the `stackhpc.terraform.infra` role.                                                                                                                                                                                                                                                              |
+| `cluster_network`                 | The name of the project internal network onto which cluster nodes should be placed.                                                                                                                                                                                                                                                                                                                                      |
+| `cluster_floating_network`        | The name of the floating network where floating IPs can be allocated.                                                                                                                                                                                                                                                                                                                                                    |
 | `cluster_upgrade_system_packages` | This variable is set when a PATCH operation is requested.<br>If given and `true`, it indicates that system packages should be upgraded. If not given, it should be assumed to be `false`.<br>The mechanism for acheiving this is appliance-specific, but it is expected to be a disruptive operation (e.g. rebuilding nodes).<br>If not given or set to `false`, disruptive operations should be avoided where possible. |
-| `cluster_state` | This variable is set when a DELETE operation is requested.<br>If given and set to `absent` all cluster resources should be deleted, otherwise cluster resources should be updated as normal. |
+| `cluster_state`                   | This variable is set when a DELETE operation is requested.<br>If given and set to `absent` all cluster resources should be deleted, otherwise cluster resources should be updated as normal.                                                                                                                                                                                                                             |
 
 ## Cluster metadata
 
@@ -167,8 +167,8 @@ potentially disruptive operation.
 
 Patching can be done in two ways:
 
-  1. In-place using the OS package manager (e.g. `yum update -y`)
-  2. By replacing the machines with new ones based on an updated image
+1. In-place using the OS package manager (e.g. `yum update -y`)
+2. By replacing the machines with new ones based on an updated image
 
 The second option is preferred, and is implemented by this sample appliance in the
 [cluster_infra role](./roles/cluster_infra). This option is preferred because it ensures more
