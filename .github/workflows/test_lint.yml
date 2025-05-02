@@ -1,0 +1,64 @@
+name: Lint
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+      - reopened
+    branches:
+      - main
+    paths-ignore:
+      # Ignore any changes that are not actually code changes
+      - .gitignore
+      - LICENSE
+
+permissions:
+  contents: read
+  packages: write
+  # To report GitHub Actions status checks
+  statuses: write
+  security-events: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+    if: github.repository == 'azimuth-cloud/azimuth-sample-appliance'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+          submodules: true
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v25.4.0
+
+      - name: Load super-linter configuration
+        # Use grep inverse matching to exclude eventual comments in the .env file
+        # because the GitHub Actions command to set environment variables doesn't
+        # support comments.
+        # Ref: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-environment-variable
+        if: always()
+        run: grep -v '^#' super-linter.env >> "$GITHUB_ENV"
+
+      - name: Run super-linter
+        uses: super-linter/super-linter@v7.3.0
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_YAML: false
