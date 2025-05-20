@@ -1,24 +1,26 @@
 ---
-
 - name: Ensure HTML directory exists
-  file:
+  ansible.builtin.file:
     path: /opt/sample-appliance/html
     state: directory
+    mode: '0755'
 
 - name: Install HTML index file
-  template:
+  ansible.builtin.template:
     src: index.html.j2
     dest: /opt/sample-appliance/html/index.html
+    mode: '0644'
   register: html_index
 
 - name: Install Nginx site config
-  template:
+  ansible.builtin.template:
     src: nginx.conf.j2
     dest: /etc/nginx/conf.d/sample-appliance.conf
+    mode: '0644'
   register: nginx_conf
 
 - name: Restart Nginx if required
-  service:
+  ansible.builtin.service:
     name: nginx
     state: restarted
   when: html_index is changed or nginx_conf is changed

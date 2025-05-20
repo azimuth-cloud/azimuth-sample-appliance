@@ -1,31 +1,33 @@
 ---
-
 - name: Install Terraform binary
-  include_role:
+  ansible.builtin.include_role:
     name: azimuth_cloud.terraform.install
 
 - name: Make Terraform project directory
-  file:
+  ansible.builtin.file:
     path: "{{ terraform_project_path }}"
     state: directory
+    mode: '0755'
 
 - name: Write backend configuration
-  copy:
+  ansible.builtin.copy:
     content: |
       terraform {
         backend "{{ terraform_backend_type }}" { }
       }
     dest: "{{ terraform_project_path }}/backend.tf"
+    mode: '0644'
 
 - name: Template Terraform files into project directory
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ terraform_project_path }}/{{ item }}"
+    mode: '0644'
   loop:
     - outputs.tf
     - providers.tf
     - resources.tf
 
 - name: Provision infrastructure
-  include_role:
+  ansible.builtin.include_role:
     name: azimuth_cloud.terraform.infra

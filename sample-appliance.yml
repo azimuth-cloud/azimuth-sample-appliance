@@ -1,34 +1,39 @@
 ---
-
 # Provision the infrastructure
 # The CaaS puts hosts for accessing the OpenStack API into the 'openstack' group
+- name: Provision the infrastructure
 - hosts: openstack
   roles:
     - cluster_infra
 
-
 # All the hosts get Nginx
+# need to set a version for Nginx
+- name: Install Nginx
 - hosts: cluster
-  become: yes
+  become: true
   roles:
     - nginx_install
 
 # Configure the backends
+- name: Configure backends
 - hosts: backends
-  become: yes
+  become: true
   roles:
     - backend
 
 # Configure the load-balancer
+- name: Configure load-balancer
 - hosts: load_balancers
-  become: yes
+  become: true
   roles:
     - load_balancer
 
 # Write the outputs as the final task
+- name: Write outputs
 - hosts: localhost
   tasks:
-    - debug: var=outputs
+    - ansible.builtin.debug:
+        var: outputs
       vars:
-        outputs: 
+        outputs:
           cluster_access_ip: "{{ hostvars[groups['openstack'][0]].cluster_gateway_ip }}"
