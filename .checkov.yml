@@ -1,0 +1,8 @@
+---
+skip-check:
+  # Requires all blocks to have rescue: - not considered appropriate
+  - CKV2_ANSIBLE_3
+  - CKV2_GHA_1
+skip-path:
+  - vendor/
+  - collections/
