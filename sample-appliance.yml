@@ -23,7 +23,7 @@
 
 # Configure the load-balancer
 - name: Configure load-balancer
-- hosts: load_balancers
+  hosts: load_balancers
   become: true
   roles:
     - load_balancer
