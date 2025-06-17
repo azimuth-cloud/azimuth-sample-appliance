@@ -2,7 +2,7 @@
 # Provision the infrastructure
 # The CaaS puts hosts for accessing the OpenStack API into the 'openstack' group
 - name: Provision the infrastructure
-- hosts: openstack
+  hosts: openstack
   roles:
     - cluster_infra
 
