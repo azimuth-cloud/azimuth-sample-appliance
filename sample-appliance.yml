@@ -30,7 +30,7 @@
 
 # Write the outputs as the final task
 - name: Write outputs
-- hosts: localhost
+  hosts: localhost
   tasks:
     - ansible.builtin.debug:
         var: outputs
