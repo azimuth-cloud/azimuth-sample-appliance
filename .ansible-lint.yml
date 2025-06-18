@@ -4,5 +4,4 @@ skip_list:
 
 exclude_paths:
   - vendor/**
-  - ansible/roles/windows-*/**
   - .github/**

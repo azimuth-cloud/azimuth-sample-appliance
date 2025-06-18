@@ -117,7 +117,7 @@ resource "openstack_networking_floatingip_v2" "load_balancer" {
   pool = "{{ cluster_floating_network }}"
 }
 
-resource "openstack_compute_floatingip_associate_v2" "load_balancer" {
+resource "openstack_networking_floatingip_associate_v2" "load_balancer" {
   floating_ip = "${openstack_networking_floatingip_v2.load_balancer.address}"
-  instance_id = "${openstack_compute_instance_v2.load_balancer.id}"
+  port_id = "${openstack_compute_instance_v2.load_balancer.network[0].port}"
 }
