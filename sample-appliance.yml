@@ -16,7 +16,7 @@
 
 # Configure the backends
 - name: Configure backends
-- hosts: backends
+  hosts: backends
   become: true
   roles:
     - backend

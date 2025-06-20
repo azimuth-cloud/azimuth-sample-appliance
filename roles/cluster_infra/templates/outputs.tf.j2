@@ -6,7 +6,7 @@ output "cluster_image" {
 
 output "cluster_gateway_ip" {
   description = "The IP address of the gateway used to contact the cluster nodes"
-  value       = "${openstack_networking_floatingip_v2.load_balancer.address}"
+  value       = "${openstack_networking_floatingip_v2.lb_fip.address}"
 }
 
 output "cluster_nodes" {
