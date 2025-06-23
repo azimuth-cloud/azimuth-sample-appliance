@@ -32,7 +32,8 @@
 - name: Write outputs
   hosts: localhost
   tasks:
-    - ansible.builtin.debug:
+    - name: Write outputs
+      ansible.builtin.debug:
         var: outputs
       vars:
         outputs:
