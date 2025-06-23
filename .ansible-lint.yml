@@ -1,0 +1,7 @@
+---
+skip_list:
+  - role-name
+
+exclude_paths:
+  - vendor/**
+  - .github/**

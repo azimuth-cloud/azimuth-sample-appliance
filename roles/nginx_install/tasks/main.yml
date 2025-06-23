@@ -1,23 +1,22 @@
 ---
-
 - name: Update apt cache
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
 
-- name: Install Nginx
-  package:
+- name: Install Nginx  # noqa package-latest
+  ansible.builtin.package:
     name: nginx
     state: latest
   register: nginx_package
 
 - name: Remove default site
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   register: nginx_default_site
 
 - name: Start and enable Nginx service
-  service:
+  ansible.builtin.service:
     name: nginx
     state: >-
       {{-
@@ -25,4 +24,4 @@
         if nginx_package is changed or nginx_default_site is changed
         else 'started'
       }}
-    enabled: yes
+    enabled: true
