@@ -1,13 +1,15 @@
 ---
-- name: Install Nginx site config
-  ansible.builtin.template:
-    src: nginx.conf.j2
-    dest: /etc/nginx/conf.d/sample-appliance.conf
-    mode: '0644'
-  register: nginx_conf
+- name: Configure Nginx
+  tasks:
+    - name: Install Nginx site config
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/conf.d/sample-appliance.conf
+        mode: '0644'
+      notify: Restart Nginx
 
-- name: Restart Nginx if required
-  service:
-    name: nginx
-    state: restarted
-  when: nginx_conf is changed
+  handlers:
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
