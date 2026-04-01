@@ -7,13 +7,13 @@
   ansible.builtin.package:
     name: nginx
     state: latest
-  register: nginx_package
+  register: nginx_install_nginx_package
 
 - name: Remove default site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
-  register: nginx_default_site
+  register: nginx_install_nginx_default_site
 
 - name: Start and enable Nginx service
   ansible.builtin.service:
@@ -21,7 +21,8 @@
     state: >-
       {{-
         'restarted'
-        if nginx_package is changed or nginx_default_site is changed
+        if nginx_install_nginx_package is changed
+        or nginx_install_nginx_default_site is changed
         else 'started'
       }}
     enabled: true
