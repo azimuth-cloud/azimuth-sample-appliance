@@ -10,17 +10,17 @@
     src: index.html.j2
     dest: /opt/sample-appliance/html/index.html
     mode: '0644'
-  register: html_index
+  register: backend_html_index
 
 - name: Install Nginx site config
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: /etc/nginx/conf.d/sample-appliance.conf
     mode: '0644'
-  register: nginx_conf
+  register: backend_nginx_conf
 
 - name: Restart Nginx if required
   ansible.builtin.service:
     name: nginx
     state: restarted
-  when: html_index is changed or nginx_conf is changed
+  when: backend_html_index is changed or backend_nginx_conf is changed
