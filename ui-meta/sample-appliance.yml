@@ -43,7 +43,7 @@ parameters:
     #     The ID of an external IP in the target tenancy.
     #   cloud.volume_size
     #     An integer that represents the size of a volume that will be created.
-    #     Used for quota calcuations.
+    #     Used for quota calculations.
     #   cloud.volume
     #     The ID of a volume in the target tenancy.
     #   cloud.cluster
